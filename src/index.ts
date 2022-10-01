@@ -4,17 +4,56 @@ import 'bootstrap'
 
 import './css/style.css'
 
+type PokeTextResponse = {
+	flavor_text: string
+	language: { name: string; url: string }
+	version: { name: string; url: string }
+}
+type PokeArrayObj = {
+	id: string
+	name: string
+	url: string
+	text?: string
+}
+
 class Poke {
 	static apiUrl = `/api/v2/pokemon/`
-	static get(num: number) {
-		const P = new Pokedex()
+	static P = new Pokedex()
+	static async get(num: number) {
 		const pokeArr = this.createPokeArr(num)
 
-		P.getResource(pokeArr).then((res) => {
-			console.log(res)
-			return res
-		})
+		// return new Promise((resolve, reject) => {
+		return this.P.getResource(pokeArr)
+			.then(async (pokes) => {
+				const _pokeObjArr: PokeArrayObj[] = []
+				pokes.forEach((poke) => {
+					const pokeObj = {
+						id: poke.id,
+						name: poke.name,
+						url: poke.sprites.front_default,
+					}
+					_pokeObjArr.push(pokeObj)
+				})
+				const pokeObjArr = await this.getText(_pokeObjArr)
+				return pokeObjArr
+			})
+			.catch((err) => {
+				throw new Error(err)
+			})
 	}
+	static async getText(pokeObjArr: PokeArrayObj[]) {
+		pokeObjArr.forEach(async (poke) => {
+			const text = await this.P.getPokemonSpeciesByName(poke.name).then((res) => {
+				const jaText = res.flavor_text_entries.filter((text: PokeTextResponse) => {
+					return text.language.name.includes('ja') && text.version.name === 'x'
+				}) as PokeTextResponse[]
+				return jaText[0].flavor_text
+			})
+			poke.text = text
+		})
+		return pokeObjArr
+	}
+
 	private static createPokeArr(num: number): string[] {
 		const pokeArr: string[] = []
 		const ids = this.createId(num)
@@ -27,14 +66,20 @@ class Poke {
 		const randomId: number[] = []
 		while (num > 0) {
 			const id = Math.floor(Math.random() * 151)
-			randomId.push(id)
-			num -= 1
+			if (!randomId.includes(id) || !id) {
+				randomId.push(id)
+				num -= 1
+			}
 		}
 		return randomId
 	}
 }
 
-Poke.get(4)
+const main = async () => {
+	const pokemon = await Poke.get(4)
+	console.log(pokemon)
+}
+main()
 
 /**
  * View
