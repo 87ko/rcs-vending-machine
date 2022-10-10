@@ -76,7 +76,7 @@ h1 {
 	animation: deplete 1.5s linear reverse forwards;
 }
 
-@keyframes left-diagonal {
+@keyframes deplete {
 	0% {
 		width: 100%;
 		opacity: 1;
