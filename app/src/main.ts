@@ -13,17 +13,17 @@ import './style.css'
 class View {
 	static initHtml(pokemonItems: PokeArrayObj[]) {
 		//pokemonの数だけボタンを作成
-		for (let i = 0; i < pokemonItems.length; i++) {
+		pokemonItems.forEach((pokemon, i) => {
 			document.getElementById('controlView')?.append(
 				new Button({
 					index: i,
 					method: () => {
-						Controller.infoCon(pokemonItems[i])
+						Controller.infoCon(pokemon)
 						Controller.sliderJump(i)
 					},
 				}).render()
 			)
-		}
+		})
 	}
 	//indexを受け取ってview情報を返す
 	static sliderHtml() {
