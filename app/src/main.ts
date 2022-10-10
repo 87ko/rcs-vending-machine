@@ -24,13 +24,20 @@ class View {
 			)
 		})
 	}
-	//indexを受け取ってview情報を返す
 	static sliderHtml() {
 		const view = document.getElementById('view')
 		view!.classList.add('text-center')
 		view!.innerHTML = `
 			<div id="main" class="main" data-index="0"></div>
 			<div id="extra" class="extra"></div>
+		`
+	}
+	static infoHtml(pokemon: PokeArrayObj) {
+		const info = document.getElementById('info')
+		info!.classList.add('info')
+		info!.innerHTML = `
+			<h4>${pokemon.name}</h4>
+			<p>${pokemon.text}</p>
 		`
 	}
 }
@@ -58,17 +65,9 @@ class Controller {
 		main?.setAttribute('data-index', index.toString())
 
 		// info
-		this.info(pokemons[index])
+		View.infoHtml(pokemons[index])
 		// animate
 		this.animateMain(currentElement, nextElement, 'right')
-	}
-	static info(pokemon: PokeArrayObj) {
-		const info = document.getElementById('info')
-		info!.classList.add('info')
-		info!.innerHTML = `
-			<h4>${pokemon.name}</h4>
-			<p>${pokemon.text}</p>
-		`
 	}
 	private static animateMain(currentElement: HTMLElement, nextElement: HTMLElement, animationType: string) {
 		// 描画処理
