@@ -105,10 +105,20 @@ h1 {
 @keyframes deplete {
 	0% {
 		width: 100%;
+		transform: scale(1.2);
 		opacity: 1;
 	}
 	100% {
 		width: 0%;
+		transform: scale(0.3);
 		opacity: 0;
+	}
+}
+
+@keyframes right {
+	0% {
+	}
+	100% {
+		text-align: right;
 	}
 }
