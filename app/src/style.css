@@ -51,7 +51,15 @@ h1 {
 }
 
 #app {
-	min-height: 400px;
+	height: 400px;
+}
+
+.container {
+	height: 400px;
+}
+
+.row {
+	height: 100%;
 }
 
 .btn {
@@ -60,20 +68,38 @@ h1 {
 	padding: 5px;
 	margin: 10px;
 	font-size: 1rem;
-	border-radius: 1vh;
-	background-color: bisque;
+	font-weight: 600;
+	color: #f9f9f9;
+	border-radius: 0.6vh;
+	background-color: #b7a185;
+}
+.btn:hover {
+	color: #b7a185;
+	background-color: #b4b4b4;
+}
+.btn:active {
+	border: solid 1px #b7a185;
+}
+
+.view {
+	position: relative;
+}
+.view div {
+	position: absolute;
 }
 
 .info {
 	text-align: center;
 }
-
-.deplete-animation {
-	animation: deplete 1.5s linear forwards;
+.full-width {
+	width: 100%;
 }
 
+.deplete-animation {
+	animation: deplete 1s linear forwards;
+}
 .expand-animation {
-	animation: deplete 1.5s linear reverse forwards;
+	animation: deplete 1s linear reverse forwards;
 }
 
 @keyframes deplete {
