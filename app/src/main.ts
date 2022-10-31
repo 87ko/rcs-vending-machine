@@ -19,11 +19,12 @@ class View {
 		target!.innerHTML = `
 		<div class="container">
 			<div class="row d-flex justify-content-center" style="min-height:300px;">
-				<div id="sliderView" class="h-100 col-10 col-md-7 p-5 bg-primary">
+				<h5 class="title col-10 text-center"> ＊ Poke MACHINE ＊ </h5>
+				<div id="sliderView" class="sliderView h-100 col-10 col-md-7">
 					<div id="view" class="h-60"></div>
 					<div id="info" class="h-40"></div>
 				</div>
-				<div id="controlView" class="col-10 col-md-5 p-2 d-flex flex-wrap align-items-center justify-content-start"></div>
+				<div id="controlView" class="col-10 col-md-5 p-2 d-flex flex-wrap align-items-center justify-content-around"></div>
 			</div>
 		</div>
 		`
@@ -70,15 +71,19 @@ class Controller {
 		// ここでsliderJumpつくる
 		const main = document.getElementById('main')
 		const extra = document.getElementById('extra')
-
 		let index = main!.getAttribute('data-index') as unknown as number
-		console.log(index)
-		if (index === inputIndex) {
-			//なにもしない
+
+		if (Number(index) === Number(inputIndex)) {
+			console.log('no action')
+			return
 		}
 		const type = this.animationType(index, inputIndex)
 		console.log(index, inputIndex, type)
+		//info
+		this.setInfo(pokemons[inputIndex])
 		//img割当
+		main!.setAttribute('class', '')
+		extra!.setAttribute('class', '')
 		const mainImg = document.createElement('img')
 		const extraImg = document.createElement('img')
 		mainImg.src = index >= 0 ? `${pokemons[index].url}` : ''
@@ -90,6 +95,9 @@ class Controller {
 	}
 	static animationType(leftIndex: number, inputIndex: number) {
 		const length = pokemons.length
+		if (Number(leftIndex) === -1) {
+			return inputIndex <= length / 2 ? 'left' : 'right'
+		}
 		const right = (length + inputIndex - leftIndex) % length
 		const left = leftIndex - inputIndex > 0 ? leftIndex - inputIndex : leftIndex - inputIndex + length
 		return right - left >= 0 ? 'left' : 'right'
@@ -101,22 +109,25 @@ class Controller {
 		extraImg: HTMLElement,
 		animationType: string
 	) {
-		// 描画処理
-		//img入替
+		/**
+		 * 描画処理
+		 * main:left extra:input
+		 */
 		main!.innerHTML = ''
 		extra!.innerHTML = ''
 		main!.append(mainImg)
 		extra!.append(extraImg)
 
-		main.classList.add('deplete-animation')
-		extra.classList.add('expand-animation')
-
 		const view = document.getElementById('view')
 
 		if (animationType === 'right') {
+			main.classList.add('left-expand-animation')
+			extra.classList.add('left-deplete-animation')
 			view!.append(main)
 			view!.append(extra)
 		} else {
+			main.classList.add('right-deplete-animation')
+			extra.classList.add('right-expand-animation')
 			view!.append(extra)
 			view!.append(main)
 		}
