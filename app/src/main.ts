@@ -1,13 +1,15 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
+import Pokedex from 'pokedex-promise-v2'
 
 import { Button } from './utils'
-import { PokeArrayObj, pokemons } from './poke'
-// import { pokemons } from './pokeapi'
+import { Poke, PokeArrayObj } from './pokeapi'
+// import { PokeArrayObj, pokemons } from './poke'
 // import type { PokeArrayObj } from './pokeapi'
 
 import './style.css'
 
+const pokemons = await Poke(12)
 /**
  * View
  * 描画部分をつくる
@@ -135,7 +137,6 @@ class Controller {
 }
 
 async function main() {
-	// const pokemons = (await Poke.get(4)) as PokeArrayObj[]
 	View.initHtml()
 	View.sliderHtml()
 }

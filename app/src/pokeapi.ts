@@ -1,10 +1,11 @@
-import Pokedex from 'pokedex-promise-v2'
+// import Pokedex from 'pokedex-promise-v2'
 
 type PokeTextResponse = {
 	flavor_text: string
 	language: { name: string; url: string }
 	version: { name: string; url: string }
 }
+
 export type PokeArrayObj = {
 	id: number
 	name: string
@@ -12,56 +13,59 @@ export type PokeArrayObj = {
 	text?: string
 }
 
-const P = new Pokedex()
+export const Poke = async (num: number): Promise<PokeArrayObj[]> => {
+	const apiUrl = `https://pokeapi.co/api/v2/pokemon`
+	const pokeIdArr = createId(num)
 
-export class Poke {
-	public static apiUrl = `/api/v2/pokemon/`
-	static async get(num: number) {
-		console.log(num)
-		const pokeArr = this.createPokeArr(num)
+	const pokeObjArr = await loadPokemons()
+	return pokeObjArr
 
-		new Promise((resolve, reject) => {
-			P.getResource(pokeArr)
-				.then(async (pokes) => {
-					const _pokeObjArr: PokeArrayObj[] = []
-					//@ts-ignore
-					pokes.forEach((poke) => {
-						const pokeObj = {
-							id: poke.id,
-							name: poke.name,
-							url: poke.sprites.front_default,
-						}
-						_pokeObjArr.push(pokeObj)
-					})
-					const pokeObjArr = await this.getText(_pokeObjArr)
-					resolve(pokeObjArr)
-				})
-				.catch((err) => {
-					throw new Error(err)
-				})
-		})
-	}
-	private static async getText(pokeObjArr: PokeArrayObj[]) {
-		pokeObjArr.forEach(async (poke) => {
-			const text = await P.getPokemonSpeciesByName(poke.name).then((res) => {
-				const jaText = (res as Pokedex.PokemonSpecies).flavor_text_entries.filter((text: PokeTextResponse) => {
-					return text.language.name.includes('ja') && text.version.name === 'x'
-				}) as PokeTextResponse[]
-				return jaText[0].flavor_text
+	async function loadPokemons(): Promise<PokeArrayObj[]> {
+		const _pokeObjArr = []
+		const res = await Promise.all<PokeArrayObj>(
+			pokeIdArr.map(async (pokeId) => {
+				let poke = await getPokemon(pokeId)
+				let pokeObj = await setPokemonInfo(poke)
+				return pokeObj
 			})
-			poke.text = text
-		})
-		return pokeObjArr
+		)
+		_pokeObjArr.push(...res)
+		return _pokeObjArr
 	}
-	private static createPokeArr(num: number): string[] {
-		const pokeArr: string[] = []
-		const ids = this.createId(num)
-		ids.forEach((id) => {
-			pokeArr.push(`${this.apiUrl}${id}`)
+	function getPokemon(pokeId: number): Promise<PokeArrayObj> {
+		return new Promise((resolve, reject) => {
+			fetch(`${apiUrl}/${pokeId}`)
+				.then((response) => response.json())
+				.then((data) => {
+					console.log(data)
+					resolve(data)
+				})
 		})
-		return pokeArr
 	}
-	private static createId(num: number): number[] {
+	async function setPokemonInfo(poke) {
+		const text = await getText(poke.species.url)
+		const pokeObj = {
+			id: poke.id,
+			name: poke.name,
+			url: poke.sprites.front_default,
+			text: text,
+		}
+		return pokeObj
+	}
+	function getText(pokeUrl: string): Promise<string> {
+		return new Promise((resolve, reject) => {
+			fetch(pokeUrl)
+				.then((response) => response.json())
+				.then((data) => {
+					const jaText = data.flavor_text_entries.filter((text: PokeTextResponse) => {
+						return text.language.name.includes('ja') && text.version.name === 'x'
+					})
+					const [kana, _kanji] = jaText
+					resolve(kana.flavor_text)
+				})
+		})
+	}
+	function createId(num: number): number[] {
 		const randomId: number[] = []
 		while (num > 0) {
 			const id = Math.floor(Math.random() * 151)
