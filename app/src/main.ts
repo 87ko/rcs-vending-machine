@@ -1,6 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
-import Pokedex from 'pokedex-promise-v2'
 
 import { Button } from './utils'
 import { Poke, PokeArrayObj } from './pokeapi'
