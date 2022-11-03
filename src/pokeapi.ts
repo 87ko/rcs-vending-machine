@@ -1,9 +1,16 @@
-// import Pokedex from 'pokedex-promise-v2'
-
 type PokeTextResponse = {
 	flavor_text: string
 	language: { name: string; url: string }
 	version: { name: string; url: string }
+}
+
+type PokeResponse = {
+	id: number
+	name: string
+	species: { name: string; url: string }
+	sprites: {
+		[key: string]: string
+	}
 }
 
 export type PokeArrayObj = {
@@ -21,7 +28,7 @@ export const Poke = async (num: number): Promise<PokeArrayObj[]> => {
 	return pokeObjArr
 
 	async function loadPokemons(): Promise<PokeArrayObj[]> {
-		const _pokeObjArr = []
+		const _pokeObjArr: PokeArrayObj[] = []
 		const res = await Promise.all<PokeArrayObj>(
 			pokeIdArr.map(async (pokeId) => {
 				let poke = await getPokemon(pokeId)
@@ -32,7 +39,7 @@ export const Poke = async (num: number): Promise<PokeArrayObj[]> => {
 		_pokeObjArr.push(...res)
 		return _pokeObjArr
 	}
-	function getPokemon(pokeId: number): Promise<PokeArrayObj> {
+	function getPokemon(pokeId: number): Promise<PokeResponse> {
 		return new Promise((resolve, reject) => {
 			fetch(`${apiUrl}/${pokeId}`)
 				.then((response) => response.json())
@@ -40,9 +47,12 @@ export const Poke = async (num: number): Promise<PokeArrayObj[]> => {
 					console.log(data)
 					resolve(data)
 				})
+				.catch((err: any) => {
+					reject(err)
+				})
 		})
 	}
-	async function setPokemonInfo(poke) {
+	async function setPokemonInfo(poke: PokeResponse) {
 		const text = await getText(poke.species.url)
 		const pokeObj = {
 			id: poke.id,
@@ -62,6 +72,9 @@ export const Poke = async (num: number): Promise<PokeArrayObj[]> => {
 					})
 					const [kana, _kanji] = jaText
 					resolve(kana.flavor_text)
+				})
+				.catch((err) => {
+					reject(err)
 				})
 		})
 	}
